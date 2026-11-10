@@ -1,0 +1,7 @@
+// Global stylesheet, imported once in BaseLayout.
+// Component styles live in each component's <style lang="scss"> block and
+// pull in shared tokens/mixins with: @use '../styles/tokens' as *;
+
+@use 'reset';
+@use 'tokens' as *;
+@use 'mixins' as *;
