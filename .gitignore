@@ -1,0 +1,21 @@
+# build output
+dist/
+
+# generated types
+.astro/
+
+# dependencies
+node_modules/
+
+# logs
+npm-debug.log*
+
+# environment variables
+.env
+.env.*
+
+# local Claude Code notes (Figma URL etc.)
+CLAUDE.local.md
+
+# macOS
+.DS_Store
