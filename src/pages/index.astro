@@ -1,11 +1,20 @@
 ---
-// TEMPORARY placeholder so the build has a page to verify the setup.
-// Replaced when we build the home page from Figma.
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/home/Hero.astro';
+import Journey from '../components/home/Journey.astro';
+import Services from '../components/home/Services.astro';
+import SelectedWork from '../components/home/SelectedWork.astro';
+
+// Case studies featured on the homepage, in order (filenames in src/content/case-studies).
+const featuredCaseStudies = ['booking-system', 'celeste', 'chris-raptis'];
 ---
 
-<BaseLayout title="Artemis Panou">
-  <main>
-    <p>Scaffold placeholder.</p>
-  </main>
+<BaseLayout
+  title="Artemis Panou — UI/UX Designer"
+  description="Artemis Panou designs interfaces and digital experiences that solve real problems — clear enough to use without thinking, considered enough to remember."
+>
+  <Hero />
+  <Journey />
+  <Services />
+  <SelectedWork slugs={featuredCaseStudies} />
 </BaseLayout>

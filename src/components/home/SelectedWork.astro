@@ -1,0 +1,237 @@
+---
+/**
+ * Selected Work carousel.
+ * - Tablet / mobile (and reduced motion): native horizontal swipe with scroll snapping.
+ * - Desktop: the stage is pinned and the cards turn as the page scrolls (js/selected-work.js).
+ * Without JS it stays a swipeable carousel, so every card and link remains reachable.
+ */
+import { getEntry } from 'astro:content';
+import SectionHeading from '../SectionHeading.astro';
+import PillLink from '../PillLink.astro';
+import WorkCard from './WorkCard.astro';
+import { formatCount } from '../../utils/format';
+
+interface Props {
+  /** Case study slugs (filenames in src/content/case-studies), in display order. */
+  slugs: string[];
+}
+
+const { slugs } = Astro.props;
+
+const entries = await Promise.all(
+  slugs.map(async (slug) => {
+    const entry = await getEntry('case-studies', slug);
+    if (!entry) throw new Error(`Selected Work: unknown case study "${slug}"`);
+    return entry;
+  }),
+);
+const total = entries.length;
+---
+
+<section class="work" aria-labelledby="work-title" data-selected-work>
+  <div class="work__head container reveal">
+    <SectionHeading id="work-title" title="Selected Work" />
+    <p>
+      Interface and UX work for digital products, web experiences, and the brand work that
+      surrounds them.
+    </p>
+  </div>
+
+  <div class="work__scroller" style={`--cards: ${total}`} data-scroller>
+    <div class="work__stage">
+      <div
+        class="work__track"
+        role="group"
+        aria-roledescription="carousel"
+        aria-label="Selected work"
+        data-track
+      >
+        {entries.map((entry, i) => <WorkCard entry={entry} index={i} total={total} />)}
+      </div>
+
+      <div class="work__foot container">
+        <div class="work__dots">
+          {
+            entries.map((entry, i) => (
+              <button
+                class="work__dot"
+                type="button"
+                aria-label={`Show project ${i + 1} of ${total}: ${entry.data.title}`}
+                aria-current={i === 0 ? 'true' : undefined}
+                data-dot
+              >
+                <span />
+              </button>
+            ))
+          }
+        </div>
+        <p class="work__count" aria-live="polite" data-count>{formatCount(0, total)}</p>
+        <PillLink class="work__all" href="/case-studies" label="See all work" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import '../../js/selected-work';
+</script>
+
+<style lang="scss">
+  @use '../../styles/mixins' as *;
+
+  .work {
+    padding-top: 56px;
+
+    @include mq(md) {
+      padding-top: 72px;
+    }
+
+    @include mq(xl) {
+      padding-top: 96px;
+    }
+  }
+
+  .work__head {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 26px;
+
+    @include mq(md) {
+      margin-bottom: 35px;
+    }
+
+    @include mq(xl) {
+      margin-bottom: 44px;
+    }
+
+    p {
+      @include text-body;
+      max-width: 520px;
+      color: var(--text-muted);
+
+      @include mq(xl) {
+        max-width: 560px;
+      }
+    }
+  }
+
+  // Swipe mode (default): one card per view, snapping.
+  .work__track {
+    --card-height: 640px;
+
+    display: flex;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+
+    @include mq(md) {
+      --card-height: 760px;
+    }
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    > :global(*) {
+      scroll-snap-align: start;
+    }
+  }
+
+  // Carousel/Pagination: dots · count · "See all work"
+  .work__foot {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 32px;
+    align-items: center;
+    margin-top: 26px;
+
+    @include mq(md) {
+      margin-top: 35px;
+    }
+
+    @include mq(xl) {
+      margin-top: 44px;
+    }
+  }
+
+  .work__all {
+    margin-left: auto;
+  }
+
+  .work__dots {
+    display: flex;
+  }
+
+  // Carousel/Dot: 44px hit area, 7px dot; current = 22 × 7 pill.
+  .work__dot {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+
+    &:focus-visible {
+      outline-offset: -4px;
+    }
+
+    span {
+      width: 7px;
+      height: 7px;
+      border: 1px solid rgba(237, 241, 244, 0.45);
+      border-radius: 4px;
+      transition:
+        width 0.3s var(--ease-out),
+        background-color 0.3s,
+        border-color 0.3s;
+    }
+
+    &[aria-current='true'] span {
+      width: 22px;
+      background: var(--accent-blue-text);
+      border-color: transparent;
+      border-radius: 5px;
+    }
+  }
+
+  .work__count {
+    @include text-label;
+    color: var(--text-faint);
+    white-space: nowrap;
+  }
+
+  // Desktop (set by the script): the stage is pinned while the tall scroller
+  // scrolls past, and the cards are stacked so they can turn into each other.
+  .work:global(.is-stacked) {
+    .work__scroller {
+      height: calc(var(--cards) * 92svh + 40svh);
+    }
+
+    .work__stage {
+      position: sticky;
+      top: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100svh;
+      padding-top: 80px; // clearance under the fixed nav
+    }
+
+    .work__track {
+      --card-height: min(760px, 100svh - 210px);
+
+      display: grid;
+      overflow: visible;
+      perspective: 2400px;
+
+      > :global(*) {
+        grid-area: 1 / 1;
+      }
+    }
+
+    .work__foot {
+      margin-top: 28px;
+    }
+  }
+</style>

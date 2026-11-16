@@ -1,0 +1,212 @@
+---
+/**
+ * Service Object: decorative wireframe drawing with a slow looping motion.
+ * Geometry is taken from the Figma "Service Object" variants (232 × 232 frame).
+ * Stroke colors come from --svc-stroke / --svc-stroke-soft, set by the parent,
+ * so the active (hover) state can raise their opacity.
+ */
+export type ServiceObjectKind = 'ux' | 'product' | 'identity' | 'build';
+
+interface Props {
+  kind: ServiceObjectKind;
+}
+
+const { kind } = Astro.props;
+
+const identityRects = [
+  { x: 60.32, y: 51.04, width: 45.24, height: 81.2 },
+  { x: 91.64, y: 75.4, width: 52.2, height: 61.48 },
+  { x: 44.08, y: 107.88, width: 40.6, height: 32.48 },
+  { x: 114.84, y: 132.24, width: 35.96, height: 30.16 },
+];
+---
+
+<div class="service-object" aria-hidden="true">
+  <svg viewBox="0 0 232 232" fill="none" focusable="false">
+    {
+      kind === 'ux' && (
+        <>
+          <path class="faint" d="M49.88 179.8L180.96 49.88" />
+          <g class="drift-diagonal" style="--drift: 1.5px">
+            <circle class="line" cx="100.92" cy="131.08" r="53.36" />
+          </g>
+          <g class="drift-diagonal" style="--drift: 3px; animation-delay: -1.95s">
+            <circle class="line" cx="129.92" cy="105.56" r="38.976" />
+          </g>
+          <g class="drift-diagonal" style="--drift: 3px; animation-delay: -3.9s">
+            <circle class="line" cx="145" cy="85.84" r="20.3" />
+          </g>
+        </>
+      )
+    }
+    {
+      kind === 'product' && (
+        <g class="turn">
+          <path
+            class="soft"
+            d="M116 54.52V114.84M116 114.84L168.23 84.68M116 114.84L168.23 145M116 114.84V175.16M116 114.84L63.77 145M116 114.84L63.77 84.68"
+          />
+          <path class="line" d="M116 54.52L168.23 84.68V145L116 175.16L63.77 145V84.68L116 54.52Z" />
+          <path class="line" d="M116 87L140.1 100.92V128.76L116 142.68L91.9 128.76V100.92L116 87Z" />
+        </g>
+      )
+    }
+    {
+      kind === 'identity' && (
+        <>
+          <path
+            class="faint"
+            d="M107.88 39.44V113.68M107.88 113.68V192.56M107.88 113.68H39.44M107.88 113.68H192.56"
+          />
+          {identityRects.map((rect, i) => (
+            <g class="drift" style={`animation-delay: ${i * -1.95}s`}>
+              <rect class="line" {...rect} />
+            </g>
+          ))}
+        </>
+      )
+    }
+    {
+      kind === 'build' && (
+        <>
+          <path class="faint" d="M116 49.88V176.32" />
+          <g class="fold fold--left">
+            <path class="line" d="M48.26 72.38L109.74 62.64V164.72L48.26 155.09V72.38Z" />
+            <path class="soft" d="M48.26 99.99L109.74 96.63M48.26 127.6L109.74 130.73" />
+          </g>
+          <g class="fold fold--right">
+            <path class="line" d="M122.73 62.64L184.21 72.38V155.09L122.73 164.72V62.64Z" />
+            <path class="soft" d="M122.73 96.63L184.21 99.99M122.73 130.73L184.21 127.6" />
+          </g>
+        </>
+      )
+    }
+  </svg>
+</div>
+
+<style lang="scss">
+  .service-object {
+    --duration: 13s;
+
+    width: 100%;
+    aspect-ratio: 1;
+    // disc glow
+    background: radial-gradient(
+      closest-side,
+      rgba(86, 116, 145, 0.08),
+      rgba(86, 116, 145, 0.04) 60%,
+      rgba(86, 116, 145, 0) 100%
+    );
+    border-radius: 50%;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  path,
+  circle,
+  rect {
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    transition: stroke 0.45s var(--ease);
+  }
+
+  .line {
+    stroke: var(--svc-stroke, rgba(144, 155, 165, 0.55));
+    stroke-width: 1.2;
+  }
+
+  .soft {
+    stroke: var(--svc-stroke-soft, rgba(86, 116, 145, 0.75));
+  }
+
+  .faint {
+    stroke: rgba(144, 155, 165, 0.2);
+  }
+
+  g {
+    transform-box: fill-box;
+    transform-origin: 50% 50%;
+    animation: var(--duration) var(--ease) infinite;
+  }
+
+  // UX Design: rings drift a few units along the diagonal and back.
+  .drift-diagonal {
+    animation-name: drift-diagonal;
+  }
+
+  @keyframes drift-diagonal {
+    0%,
+    100% {
+      transform: translate(calc(var(--drift) * -1), var(--drift)) scale(0.992);
+    }
+
+    50% {
+      transform: translate(var(--drift), calc(var(--drift) * -1)) scale(1.008);
+    }
+  }
+
+  // Product & UI Design: one full turn per loop.
+  .turn {
+    animation-name: turn;
+    animation-timing-function: linear;
+  }
+
+  @keyframes turn {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  // Visual Identity: each rectangle drifts about two units and back.
+  .drift {
+    animation-name: drift;
+  }
+
+  @keyframes drift {
+    0%,
+    100% {
+      transform: translate(-2px, 1.5px);
+    }
+
+    50% {
+      transform: translate(2px, -1.5px);
+    }
+  }
+
+  // Design to Build: the panes fold a few degrees about the seam
+  // (scaleX ≈ cos 40°/42° … cos 44°/42°, hinged on the seam-side edge).
+  .fold {
+    animation-name: fold;
+  }
+
+  .fold--left {
+    transform-origin: 100% 50%;
+  }
+
+  .fold--right {
+    transform-origin: 0% 50%;
+  }
+
+  @keyframes fold {
+    0%,
+    100% {
+      transform: scaleX(1.031);
+    }
+
+    50% {
+      transform: scaleX(0.968);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    g {
+      animation: none;
+    }
+  }
+</style>

@@ -32,7 +32,7 @@ public/               copied as-is, NOT hashed: favicon, robots.txt, _headers (C
 src/
   assets/             images/fonts, optimized + hashed (use <Image /> from astro:assets)
   components/         reusable .astro components (Header, Footer, ...)
-  layouts/            BaseLayout.astro: <head>, meta/OG/canonical, global.scss, main.js
+  layouts/            BaseLayout.astro: <head>, meta/OG/canonical, fonts, global.scss, SiteNav + SiteFooter
   pages/              one file per route
   content/            content collections (case study data)
   content.config.ts   collection schemas
@@ -40,6 +40,13 @@ src/
   js/                 client JS, loaded via <script> tags (bundled + hashed; don't use is:inline)
 ```
 
+- Breakpoints (min-width, mobile-first) live in `_tokens.scss`: sm 640, md 720 (tablet), lg 1000, xl 1100 (desktop). Use `@include mq(md)`. `mq-below` / `mq-between` are only for per-layout rules.
+- Figma text styles are mixins in `_mixins.scss` (`text-label`, `text-body`, `text-section-title`, …). CSS custom property names match the Figma variables (`--text`, `--line`, …) in `_theme.scss`.
+- Fonts come from the Astro Fonts API (`fonts` in `astro.config.mjs`, Google provider, self-hosted at build). `--font-display` is Bricolage Grotesque and `--font-body` is Montserrat.
+- If a parent needs to style a child component's root, the child takes `class` and spreads `...attrs` onto its root, which forwards Astro's scope attribute. Don't use `:global()` for this.
+- SVG assets in `src/assets` are imported as components (`import Icon from '…svg'`). Icons use `currentColor`.
+- JS only where needed: page scripts live in `src/js/` and are imported from the component's `<script>`. Prefer CSS (including scroll-driven animations in `@supports`) for motion.
+- Homepage sections are in `components/home/`. The featured case studies are the `featuredCaseStudies` slug list in `pages/index.astro`.
 - Global styles: `global.scss`, imported once in `BaseLayout`. Component styles: `<style lang="scss">` (scoped), with `@use '../styles/tokens' as *;`.
 - Design tokens (colors, type, spacing, breakpoints) come from Figma variables and go in `_tokens.scss` / `_mixins.scss`.
 

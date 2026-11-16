@@ -1,0 +1,299 @@
+---
+import { getImage } from 'astro:assets';
+import Marquee from '../Marquee.astro';
+import heroWide from '../../assets/home/hero-portrait-wide.webp';
+import heroTall from '../../assets/home/hero-portrait-tall.webp';
+
+// Art direction: a tall crop below desktop, the panoramic frame on desktop.
+const [tall, wide] = await Promise.all([
+  getImage({ src: heroTall, widths: [480, 780, 1100, 1400] }),
+  getImage({ src: heroWide, widths: [1280, 1920, 2400] }),
+]);
+---
+
+<header class="hero">
+  <picture class="hero__media">
+    <source media="(min-width: 1100px)" srcset={wide.srcSet.attribute} sizes="100vw" />
+    <img
+      class="hero__img"
+      src={tall.src}
+      srcset={tall.srcSet.attribute}
+      sizes="100vw"
+      width={heroTall.width}
+      height={heroTall.height}
+      alt="Artemis Panou, photographed in black and white against an open sky, hair caught by the wind."
+      fetchpriority="high"
+      decoding="async"
+    />
+  </picture>
+  <div class="hero__scrim"></div>
+
+  <!-- Blended with the photo; the accessible name is the h1 below. -->
+  <Marquee class="hero__marquee" text="Artemis Panou  •  " />
+
+  <div class="hero__content container">
+    <h1 class="visually-hidden">Artemis Panou</h1>
+    <p class="hero__role">UI/UX Designer</p>
+    <p class="hero__statement">
+      I design interfaces and digital experiences that solve real problems — clear enough to use
+      without thinking, considered enough to remember.
+    </p>
+    <div class="hero__foot">
+      <p class="hero__scroll">Scroll</p>
+      <p class="hero__projects">Projects — 2023/2026</p>
+    </div>
+  </div>
+</header>
+
+<style lang="scss">
+  @use '../../styles/mixins' as *;
+
+  .hero {
+    position: relative;
+    display: flex;
+    min-height: 100svh;
+    overflow: hidden;
+    isolation: isolate; // keeps the marquee's blend inside the hero
+  }
+
+  .hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    background: var(--surface);
+  }
+
+  .hero__img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: grayscale(1);
+  }
+
+  // Floor band (tablet / mobile) and ceiling, from Figma.
+  .hero__scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(8, 12, 17, 0.72) 0%,
+        rgba(8, 12, 17, 0.63) 16%,
+        rgba(8, 12, 17, 0.17) 31%,
+        rgba(8, 12, 17, 0) 43%
+      ),
+      linear-gradient(
+        0deg,
+        rgba(8, 12, 17, 0.985) 0%,
+        rgba(8, 12, 17, 0.97) 34%,
+        rgba(8, 12, 17, 0.88) 47%,
+        rgba(8, 12, 17, 0.52) 60%,
+        rgba(8, 12, 17, 0.16) 74%,
+        rgba(8, 12, 17, 0) 88%
+      );
+
+    @include mq(md) {
+      background:
+        linear-gradient(
+          180deg,
+          rgba(8, 12, 17, 0.72) 0%,
+          rgba(8, 12, 17, 0.63) 16%,
+          rgba(8, 12, 17, 0.17) 31%,
+          rgba(8, 12, 17, 0) 43%
+        ),
+        linear-gradient(
+          0deg,
+          rgba(8, 12, 17, 0.97) 0%,
+          rgba(8, 12, 17, 0.95) 26%,
+          rgba(8, 12, 17, 0.8) 40%,
+          rgba(8, 12, 17, 0.42) 53%,
+          rgba(8, 12, 17, 0.12) 68%,
+          rgba(8, 12, 17, 0) 84%
+        );
+    }
+
+    // Desktop: type-side wash on the left, plus a dissolve into the page.
+    @include mq(xl) {
+      background:
+        linear-gradient(180deg, rgba(8, 12, 17, 0) 90%, var(--bg) 100%),
+        linear-gradient(
+          180deg,
+          rgba(8, 12, 17, 0.66) 0%,
+          rgba(8, 12, 17, 0.52) 11%,
+          rgba(8, 12, 17, 0.14) 22%,
+          rgba(8, 12, 17, 0) 32%
+        ),
+        linear-gradient(
+          0deg,
+          rgba(8, 12, 17, 0.88) 0%,
+          rgba(8, 12, 17, 0.4) 13%,
+          rgba(8, 12, 17, 0) 34%
+        ),
+        linear-gradient(
+          90deg,
+          rgba(8, 12, 17, 0.95) 0%,
+          rgba(8, 12, 17, 0.92) 24%,
+          rgba(8, 12, 17, 0.78) 40%,
+          rgba(8, 12, 17, 0.4) 55%,
+          rgba(8, 12, 17, 0.1) 70%,
+          rgba(8, 12, 17, 0) 84%
+        );
+    }
+  }
+
+  // Display/Hero Marquee: 144 → 287 → 475 at the Figma frame widths.
+  .hero__marquee {
+    --marquee-duration: 34s;
+
+    position: absolute;
+    top: 27%;
+    right: 0;
+    left: 0;
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 36.9vw;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: 0.01em;
+    mix-blend-mode: difference;
+
+    @include mq(md) {
+      top: 24%;
+      font-size: 28vw;
+    }
+
+    @include mq(xl) {
+      top: 18.6%;
+      font-size: 33vw;
+    }
+  }
+
+  .hero__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-top: 120px;
+    padding-bottom: 47px;
+
+    @include mq(md) {
+      padding-bottom: 71px;
+    }
+
+    @include mq(xl) {
+      padding-bottom: 41px;
+    }
+  }
+
+  .hero__role {
+    @include text-label;
+    margin-bottom: 15px;
+    color: var(--text);
+    opacity: 0.8;
+  }
+
+  .hero__statement {
+    @include text-body(large);
+    max-width: 640px;
+    color: var(--text);
+    opacity: 0.88;
+
+    @include mq(xl) {
+      max-width: 440px;
+    }
+  }
+
+  .hero__foot {
+    @include text-label;
+    display: flex;
+    justify-content: space-between;
+    margin-top: 60px;
+    color: var(--text-muted);
+
+    @include mq(xl) {
+      margin-top: 50px;
+    }
+  }
+
+  .hero__scroll {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+
+    &::before {
+      content: '';
+      width: 28px;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(126, 157, 187, 0.7), rgba(126, 157, 187, 0));
+
+      @include mq(md) {
+        width: 40px;
+      }
+    }
+  }
+
+  .hero__projects {
+    display: none;
+
+    @include mq(md) {
+      display: block;
+    }
+  }
+
+  // ── motion ──────────────────────────────────────────────────────────
+  // Entrance: the copy rises in once on load.
+  .hero__role,
+  .hero__statement,
+  .hero__foot {
+    animation: hero-rise 0.8s var(--ease-out) both;
+  }
+
+  .hero__statement {
+    animation-delay: 0.15s;
+  }
+
+  .hero__foot {
+    animation-delay: 0.3s;
+  }
+
+  @keyframes hero-rise {
+    from {
+      opacity: 0;
+      translate: 0 14px;
+    }
+  }
+
+  // Parallax while scrolling past the hero (scroll-driven, no JS).
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .hero__img,
+      .hero__content {
+        animation-timeline: scroll(root);
+        animation-range: 0 100svh;
+        animation-fill-mode: both;
+        animation-timing-function: linear;
+      }
+
+      .hero__img {
+        animation-name: hero-photo-drift;
+      }
+
+      .hero__content {
+        animation-name: hero-copy-lift;
+      }
+    }
+  }
+
+  @keyframes hero-photo-drift {
+    to {
+      transform: translateY(-9%) scale(1.07);
+    }
+  }
+
+  @keyframes hero-copy-lift {
+    to {
+      opacity: 0.15;
+      transform: translateY(-18%);
+    }
+  }
+</style>

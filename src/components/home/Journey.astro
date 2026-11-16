@@ -1,0 +1,265 @@
+---
+import SectionHeading from '../SectionHeading.astro';
+import DownloadIcon from '../../assets/icons/download.svg';
+
+const experience = [
+  {
+    label: 'Learned',
+    period: '2018',
+    role: 'BA Digital Design',
+    organisation: 'Vakalo Art & Design',
+    description:
+      'Where my interest in digital experiences, interaction and visual communication began.',
+  },
+  {
+    label: 'Built',
+    period: '2021',
+    role: 'Web Designer & Frontend Developer',
+    organisation: 'Mainsys · Internship',
+    description: 'My first experience designing and building real websites from start to finish.',
+  },
+  {
+    label: 'Designing',
+    period: '2022 — Present',
+    role: 'UI/UX Designer',
+    organisation: 'ADS Solutions',
+    description:
+      'Designing interfaces, responsive websites, visual identities and digital experiences for real clients and products.',
+    current: true,
+  },
+];
+---
+
+<section class="journey container" aria-labelledby="journey-title">
+  <header class="journey__intro reveal">
+    <SectionHeading
+      class="journey__heading"
+      id="journey-title"
+      eyebrow="Experience"
+      title="The journey so far."
+    />
+    <div class="journey__lead">
+      <p>
+        From digital design and frontend foundations to creating interfaces, websites and visual
+        systems in an agency environment.
+      </p>
+      <!-- TODO: no CV PDF yet. Once it exists, swap this for
+           <a class="journey__cv" href="/Artemis-Panou-CV.pdf" download>…</a> -->
+      <button class="journey__cv" type="button" disabled aria-describedby="journey-cv-note">
+        Download CV
+        <DownloadIcon aria-hidden="true" />
+      </button>
+      <span class="visually-hidden" id="journey-cv-note">The CV is not available yet.</span>
+    </div>
+  </header>
+
+  <ol class="journey__list">
+    {
+      experience.map((item) => (
+        <li class:list={['journey__row reveal', { 'journey__row--current': item.current }]}>
+          <p class="journey__label">{item.label}</p>
+          <p class="journey__period">
+            {item.period}
+            {item.current && (
+              <span class="journey__now" aria-hidden="true">
+                Current
+              </span>
+            )}
+          </p>
+          <div class="journey__role">
+            <h3>{item.role}</h3>
+            <p>{item.organisation}</p>
+          </div>
+          <p class="journey__description">{item.description}</p>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style lang="scss">
+  @use '../../styles/mixins' as *;
+
+  .journey {
+    --columns: minmax(0, 8fr) minmax(0, 11fr) minmax(0, 21fr) minmax(0, 20fr);
+
+    padding-top: 56px;
+    padding-bottom: 16px;
+
+    @include mq(md) {
+      padding-top: 72px;
+      padding-bottom: 24px;
+    }
+
+    @include mq(xl) {
+      padding-top: 96px;
+      padding-bottom: 32px;
+    }
+  }
+
+  // ── intro ───────────────────────────────────────────────────────────
+  .journey__intro {
+    display: grid;
+    gap: 24px;
+    margin-bottom: 36px;
+
+    @include mq(md) {
+      margin-bottom: 48px;
+    }
+
+    // The intro shares the row grid: the lead sits above the description column.
+    @include mq(lg) {
+      grid-template-columns: var(--columns);
+      column-gap: 32px;
+    }
+
+    @include mq(xl) {
+      margin-bottom: 64px;
+    }
+  }
+
+  .journey__heading {
+    @include mq(lg) {
+      grid-column: 1 / 4;
+    }
+  }
+
+  .journey__lead {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    align-items: flex-start;
+
+    @include mq(lg) {
+      gap: 26px;
+      padding-top: 11px; // aligns the paragraph with the heading
+    }
+
+    p {
+      @include text-body;
+      max-width: 44ch;
+      color: var(--text-muted);
+    }
+  }
+
+  // Button/Download CV (Disabled until the PDF exists)
+  .journey__cv {
+    @include text-button;
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 20px;
+    color: var(--text);
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+
+    &:disabled {
+      color: var(--text-faint);
+      border-color: var(--line);
+      cursor: default;
+    }
+  }
+
+  // ── experience index ────────────────────────────────────────────────
+  .journey__list {
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .journey__row {
+    display: grid;
+    gap: 6px;
+    padding-block: 22px;
+    border-top: 1px solid var(--line-strong);
+
+    @include mq(sm) {
+      grid-template-areas:
+        'label role'
+        'period role'
+        '. description';
+      grid-template-columns: minmax(150px, 0.3fr) minmax(0, 1fr);
+      column-gap: 32px;
+
+      .journey__label {
+        grid-area: label;
+      }
+
+      .journey__period {
+        grid-area: period;
+      }
+
+      .journey__role {
+        grid-area: role;
+      }
+
+      .journey__description {
+        grid-area: description;
+      }
+    }
+
+    @include mq(md) {
+      padding-block: 34px;
+    }
+
+    @include mq(lg) {
+      grid-template-areas: 'label period role description';
+      grid-template-columns: var(--columns);
+      align-items: start;
+    }
+  }
+
+  .journey__row--current {
+    border-top-color: var(--accent-green);
+  }
+
+  .journey__label {
+    @include text-meta;
+    color: var(--accent-blue-text);
+  }
+
+  .journey__period {
+    color: var(--text-muted);
+    font-family: var(--font-display);
+    font-size: 21px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  .journey__now {
+    @include text-meta;
+    display: block;
+    margin-top: 6px;
+    color: var(--accent-green-text);
+
+    @include mq(lg) {
+      margin-top: 8px;
+    }
+  }
+
+  .journey__role {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    @include mq(lg) {
+      gap: 8px;
+    }
+
+    h3 {
+      @include text-heading(4);
+      color: var(--text);
+    }
+
+    p {
+      @include text-body;
+      color: var(--text-muted);
+    }
+  }
+
+  .journey__description {
+    @include text-body;
+    color: var(--text-muted);
+  }
+</style>

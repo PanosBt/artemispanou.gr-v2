@@ -1,5 +1,9 @@
 ---
 import '../styles/global.scss';
+import { Font } from 'astro:assets';
+import SiteNav from '../components/SiteNav.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { cleanPath } from '../utils/url';
 
 interface Props {
   title: string;
@@ -9,10 +13,7 @@ interface Props {
 }
 
 const { title, description = '', ogImage } = Astro.props;
-// With build.format 'file', Astro.url.pathname ends in .html at build time
-// (e.g. /index.html, /case-studies.html). Strip it to get the clean URL.
-const cleanPath = Astro.url.pathname.replace(/(\/index)?\.html$/, '') || '/';
-const canonical = new URL(cleanPath, Astro.site);
+const canonical = new URL(cleanPath(Astro.url.pathname), Astro.site);
 const ogImageUrl = ogImage ? new URL(ogImage, Astro.site) : undefined;
 ---
 
@@ -33,9 +34,15 @@ const ogImageUrl = ogImage ? new URL(ogImage, Astro.site) : undefined;
     {description && <meta property="og:description" content={description} />}
     {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
     <meta name="twitter:card" content={ogImageUrl ? 'summary_large_image' : 'summary'} />
+
+    <Font cssVariable="--font-display" preload />
+    <Font cssVariable="--font-body" preload />
   </head>
   <body>
-    <slot />
-    <script src="../js/main.js"></script>
+    <SiteNav />
+    <main>
+      <slot />
+    </main>
+    <SiteFooter />
   </body>
 </html>

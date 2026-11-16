@@ -1,0 +1,54 @@
+---
+/** Section head: optional eyebrow with accent hairline, then the section title (h2). */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends Omit<HTMLAttributes<'div'>, 'id' | 'title'> {
+  title: string;
+  /** Used as the h2 id, so the section can reference it with aria-labelledby. */
+  id: string;
+  eyebrow?: string;
+}
+
+// `...attrs` also forwards the parent's style-scope attribute, so a parent can style the root via `class`.
+const { title, id, eyebrow, class: className, ...attrs } = Astro.props;
+---
+
+<div class:list={['section-heading', className]} {...attrs}>
+  {eyebrow && <p class="section-heading__eyebrow">{eyebrow}</p>}
+  <h2 class="section-heading__title" id={id}>{title}</h2>
+</div>
+
+<style lang="scss">
+  @use '../styles/mixins' as *;
+
+  .section-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    align-items: flex-start;
+
+    @include mq(xl) {
+      gap: 18px;
+    }
+  }
+
+  .section-heading__eyebrow {
+    @include text-meta;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    color: var(--accent-blue-text);
+
+    &::after {
+      content: '';
+      width: clamp(40px, 8vw, 96px);
+      height: 1px;
+      background: var(--gradient-accent);
+    }
+  }
+
+  .section-heading__title {
+    @include text-section-title;
+    color: var(--text);
+  }
+</style>
