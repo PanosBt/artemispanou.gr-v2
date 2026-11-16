@@ -1,0 +1,211 @@
+---
+/** Footer: contact block, the same on every page. */
+import Marquee from './Marquee.astro';
+import Tag from './Tag.astro';
+
+const email = 'artepanou@gmail.com';
+
+// TODO: add each profile's `href` once the real URLs exist (rendered as plain pills until then).
+const socials: { label: string; href?: string }[] = [
+  { label: 'Instagram' },
+  { label: 'Read.cv' },
+  { label: 'Dribbble' },
+  { label: 'LinkedIn' },
+];
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer" id="contact">
+  <Marquee class="footer__marquee" text="LET'S TALK" repeat={3} />
+
+  <div class="footer__inner container">
+    <p class="footer__kicker">Have a real problem? — Let's talk</p>
+    <p class="footer__headline">
+      Let's build something <em>worth remembering.</em>
+    </p>
+
+    <div class="footer__lead">
+      <a class="footer__email" href={`mailto:${email}`}>{email}</a>
+      <ul class="footer__socials" aria-label="Social profiles">
+        {
+          socials.map((social) => (
+            <li>
+              <Tag label={social.label} href={social.href} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <div class="footer__colophon">
+      <p>© {year} Artemis Panou</p>
+      <p>Designed in Figma · Built with Claude Code</p>
+    </div>
+  </div>
+</footer>
+
+<style lang="scss">
+  @use '../styles/mixins' as *;
+
+  .footer {
+    position: relative;
+    overflow: hidden;
+    padding: 48px 0 40px;
+
+    @include mq(md) {
+      padding-top: 61px;
+    }
+
+    @include mq(xl) {
+      padding-top: 88px;
+    }
+  }
+
+  // Footer/Marquee: decorative band behind the headline.
+  // The type scales with the viewport (158px = 11vw at the 1440 desktop frame), so the
+  // letters always fit; Figma's tablet/mobile frames keep 158px and crop them.
+  .footer__marquee {
+    --marquee-duration: 152s;
+    --marquee-gap: 1em;
+
+    position: absolute;
+    top: 10px;
+    right: 0;
+    left: 0;
+    padding-top: 10px;
+    color: rgba(237, 241, 244, 0.04);
+    font-family: var(--font-display);
+    font-size: clamp(60px, 11vw, 158px);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.02em;
+
+    @include mq(md) {
+      top: 18px;
+    }
+  }
+
+  .footer__inner {
+    position: relative;
+  }
+
+  .footer__kicker {
+    @include text-label;
+    margin-bottom: 14px;
+    color: var(--text-faint);
+  }
+
+  // Footer/Headline: 30 → 47 → 60, ExtraBold
+  .footer__headline {
+    max-width: 960px;
+    margin-bottom: 36px;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+
+    @include mq(md) {
+      max-width: 720px;
+      margin-bottom: 46px;
+      font-size: 47px;
+      line-height: 1.04;
+    }
+
+    @include mq(xl) {
+      max-width: 960px;
+      margin-bottom: 52px;
+      font-size: 60px;
+      line-height: 1.02;
+    }
+
+    em {
+      color: var(--accent-blue-text);
+      font-style: normal;
+    }
+  }
+
+  .footer__lead {
+    display: flex;
+    flex-direction: column;
+    gap: 37px;
+    align-items: flex-start;
+
+    @include mq(md) {
+      flex-flow: row wrap;
+      gap: 20px 40px;
+      align-items: flex-end;
+      justify-content: space-between;
+    }
+  }
+
+  // Footer/Email: gradient underline grows in on hover/focus.
+  .footer__email {
+    position: relative;
+    padding-block: 13px;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 25px;
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: -0.01em;
+
+    @include mq(md) {
+      font-size: 20.5px;
+    }
+
+    @include mq(xl) {
+      font-size: 25px;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      bottom: 6px;
+      left: 0;
+      height: 1px;
+      background: var(--gradient-accent);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.5s var(--ease-out);
+    }
+
+    &:hover::after,
+    &:focus-visible::after {
+      transform: scaleX(1);
+    }
+  }
+
+  .footer__socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .footer__colophon {
+    @include text-label;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 90px;
+    color: var(--text-faint);
+
+    @include mq(md) {
+      flex-direction: row;
+      gap: 24px;
+      justify-content: space-between;
+      margin-top: 64px;
+    }
+
+    p {
+      // Browsers add letter-spacing after the last glyph too; Figma doesn't. Pulling the
+      // trailing 0.14em back lets the line fit (and right-align) exactly as in Figma.
+      margin-right: -0.14em;
+      // On phones narrower than the design, break into even lines instead of an orphan word.
+      text-wrap: balance;
+    }
+  }
+</style>

@@ -1,0 +1,36 @@
+// Runtime design tokens (CSS custom properties). Names match the Figma variables.
+// Emitted once, from global.scss.
+@use 'mixins' as *;
+
+:root {
+  // Colors
+  --bg: #080c11;
+  --surface: #111923;
+  --surface-raised: #17212c;
+  --text: #edf1f4;
+  --text-muted: #909ba5;
+  --text-faint: #7f8b96;
+  --accent-blue: #567491;
+  --accent-blue-text: #7e9dbb;
+  --accent-green: #678a7a;
+  --accent-green-text: #86ab99;
+  --line: rgba(237, 241, 244, 0.1);
+  --line-strong: rgba(237, 241, 244, 0.18);
+  --gradient-accent: linear-gradient(90deg, var(--accent-blue), var(--accent-green));
+
+  // Layout
+  --edge: 24px;
+  --content-max: 1440px;
+
+  // Motion
+  --ease: cubic-bezier(0.45, 0, 0.55, 1);
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  @include mq(md) {
+    --edge: 46px;
+  }
+
+  @include mq(xl) {
+    --edge: 64px;
+  }
+}

@@ -1,0 +1,70 @@
+---
+/**
+ * Decorative, endlessly scrolling line of text.
+ * Two identical halves translate by -50%, so the loop has no jump.
+ * Typography comes from the parent (via `class`); tune per instance with:
+ *   --marquee-duration  time for one half to scroll by
+ *   --marquee-gap       space after each repetition
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+  text: string;
+  /** Repetitions per half. Each half must be wider than the viewport. */
+  repeat?: number;
+}
+
+// `...attrs` also forwards the parent's style-scope attribute, so a parent can style the root via `class`.
+const { text, repeat = 2, class: className, ...attrs } = Astro.props;
+const half = Array.from({ length: repeat }, () => text);
+---
+
+<div class:list={['marquee', className]} aria-hidden="true" {...attrs}>
+  <div class="marquee__track">
+    {
+      [0, 1].map(() => (
+        <div class="marquee__half">
+          {half.map((item) => (
+            <span class="marquee__item">{item}</span>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style lang="scss">
+  .marquee {
+    overflow: hidden;
+    white-space: pre;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .marquee__track {
+    display: flex;
+    width: max-content;
+    animation: marquee var(--marquee-duration, 40s) linear infinite;
+  }
+
+  .marquee__half {
+    display: flex;
+    flex: none;
+  }
+
+  .marquee__item {
+    padding-right: var(--marquee-gap, 0);
+  }
+
+  @keyframes marquee {
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee__track {
+      animation: none;
+    }
+  }
+</style>
