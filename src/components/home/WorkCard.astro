@@ -6,6 +6,7 @@ import Marquee from '../Marquee.astro';
 import Tag from '../Tag.astro';
 import ArrowIcon from '../../assets/icons/arrow-up-right.svg';
 import { formatCount } from '../../utils/format';
+import { caseStudyUrl } from '../../utils/url';
 
 interface Props {
   entry: CollectionEntry<'case-studies'>;
@@ -14,7 +15,7 @@ interface Props {
 }
 
 const { entry, index, total } = Astro.props;
-const { title, summary, tags, thumbnail, thumbnailAlt } = entry.data;
+const { title, summary, category, thumbnail, thumbnailAlt } = entry.data;
 ---
 
 <article class="work-card">
@@ -32,7 +33,7 @@ const { title, summary, tags, thumbnail, thumbnailAlt } = entry.data;
     <div class="work-card__info">
       <h3 class="visually-hidden">{title}</h3>
       <p class="work-card__summary">{summary}</p>
-      <Tag label={tags.join(' · ')} />
+      <Tag label={category} />
     </div>
   </div>
 
@@ -42,7 +43,7 @@ const { title, summary, tags, thumbnail, thumbnailAlt } = entry.data;
   <span class="work-card__chip work-card__arrow" aria-hidden="true"><ArrowIcon /></span>
 
   <!-- The whole card is the link. -->
-  <a class="work-card__link" href={`/case-studies/${entry.id}`} aria-label={`${title} — read the case study`}
+  <a class="work-card__link" href={caseStudyUrl(entry.id)} aria-label={`${title} — read the case study`}
   ></a>
 </article>
 

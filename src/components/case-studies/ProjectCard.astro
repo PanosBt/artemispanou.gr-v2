@@ -1,0 +1,248 @@
+---
+/**
+ * Card/Archive: one project on /case-studies. The whole card links to the case study.
+ * Spacing and type scale with the card's own width (container query units).
+ */
+import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+import ArrowIcon from '../../assets/icons/arrow-up-right.svg';
+import { caseStudyUrl } from '../../utils/url';
+
+interface Props {
+  entry: CollectionEntry<'case-studies'>;
+  /** Card number shown in the corner (01, 02, …). */
+  number: number;
+  /** Load the image straight away (cards visible on load). */
+  eager?: boolean;
+}
+
+const { entry, number, eager = false } = Astro.props;
+const { title, category, summary, thumbnail, thumbnailAlt } = entry.data;
+const titleId = `project-${entry.id}`;
+---
+
+<a class="project" href={caseStudyUrl(entry.id)} aria-labelledby={titleId}>
+  <div class="project__media">
+    <Image
+      src={thumbnail}
+      alt={thumbnailAlt}
+      widths={[400, 700, 1000, 1300]}
+      sizes="(min-width: 1100px) 640px, (min-width: 720px) 50vw, 100vw"
+      loading={eager ? 'eager' : 'lazy'}
+    />
+  </div>
+
+  <p class="project__top">
+    <span>{category}</span>
+    <span class="project__number" aria-hidden="true">{String(number).padStart(2, '0')}</span>
+  </p>
+
+  <div class="project__info">
+    <h2 class="project__title" id={titleId}>{title}</h2>
+    <p class="project__summary">{summary}</p>
+  </div>
+
+  <span class="project__arrow" aria-hidden="true">
+    <ArrowIcon width={22} height={22} />
+  </span>
+</a>
+
+<style lang="scss">
+  @use '../../styles/mixins' as *;
+
+  // Desktop 640 × 512 and tablet 455 × 364 (5:4); mobile 342 × 428 (4:5).
+  .project {
+    --pad: clamp(17px, 5.4cqi, 35px);
+    --pad-top: clamp(15px, 4.1cqi, 26px);
+    --pad-bottom: clamp(21px, 4.85cqi, 31px);
+    --arrow: 46px;
+
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    transition: border-color 0.5s var(--ease-out);
+    container-type: inline-size;
+    isolation: isolate;
+
+    @include mq(md) {
+      --arrow: clamp(46px, 12.8cqi, 58px);
+
+      aspect-ratio: 5 / 4;
+    }
+  }
+
+  // ── image + scrims ──────────────────────────────────────────────────
+  .project__media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.015);
+      transition: transform 0.9s var(--ease-out);
+    }
+
+    // Dark toward the text at the bottom, lighter behind the top label.
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(
+          0deg,
+          rgba(8, 12, 17, 0.94) 0%,
+          rgba(8, 12, 17, 0.62) 32%,
+          rgba(8, 12, 17, 0.1) 66%,
+          rgba(8, 12, 17, 0) 100%
+        ),
+        linear-gradient(180deg, rgba(8, 12, 17, 0.66) 0%, rgba(8, 12, 17, 0.16) 16%, rgba(8, 12, 17, 0) 30%);
+    }
+  }
+
+  // Desktop: the thumbnail floats inside the card; smaller cards are filled.
+  @include mq(xl) {
+    .project__media img {
+      position: absolute;
+      top: 19.5%;
+      left: 6.75%;
+      width: 86.5%;
+      height: auto;
+    }
+  }
+
+  // ── text ────────────────────────────────────────────────────────────
+  .project__top {
+    @include text-label;
+    position: absolute;
+    top: var(--pad-top);
+    right: var(--pad);
+    left: var(--pad);
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    opacity: 0.92;
+
+    // On phones the arrow takes the number's corner.
+    @include mq-below(md) {
+      padding-right: calc(var(--arrow) + 8px);
+    }
+  }
+
+  .project__number {
+    opacity: 0.65; // 0.6 overall (with the row's 0.92)
+
+    @include mq-below(md) {
+      display: none;
+    }
+  }
+
+  .project__info {
+    position: absolute;
+    right: var(--pad);
+    bottom: var(--pad-bottom);
+    left: var(--pad);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+
+    // Leaves room for the arrow beside the text.
+    @include mq(md) {
+      right: calc(var(--pad) + var(--arrow) + 12px);
+      gap: 12px;
+    }
+  }
+
+  // Card/Project Title: 43 (mobile) · 45 (tablet) · 62 (desktop)
+  .project__title {
+    font-family: var(--font-display);
+    font-size: clamp(34px, 12.6cqi, 52px);
+    font-weight: 700;
+    line-height: 0.94;
+    letter-spacing: -0.04em;
+    text-wrap: balance;
+
+    @include mq(md) {
+      font-size: clamp(30px, 9.8cqi, 62px);
+    }
+  }
+
+  .project__summary {
+    @include text-body;
+    opacity: 0.86;
+
+    // Keeps three lines inside the smallest two-column cards.
+    @include mq(md) {
+      font-size: clamp(14px, 3.6cqi, 16px);
+    }
+  }
+
+  // Control/Arrow (Large): top-right corner on phones, beside the text from tablet up.
+  .project__arrow {
+    position: absolute;
+    top: 13px;
+    right: 13px;
+    display: grid;
+    place-items: center;
+    width: var(--arrow);
+    height: var(--arrow);
+    color: var(--text);
+    background: rgba(17, 25, 35, 0.62);
+    border: 1px solid rgba(237, 241, 244, 0.3);
+    border-radius: 50%;
+    transition:
+      transform 0.5s var(--ease-out),
+      color 0.5s,
+      background-color 0.5s,
+      border-color 0.5s;
+
+    @include mq(md) {
+      top: auto;
+      right: var(--pad);
+      bottom: var(--pad-bottom);
+    }
+
+    svg {
+      transition: transform 0.5s var(--ease-out);
+    }
+  }
+
+  // ── hover / focus ───────────────────────────────────────────────────
+  // Hairline accent + the arrow fills; with motion welcome, the image eases in
+  // and the arrow nudges toward its direction.
+  .project:is(:hover, :focus-visible) {
+    border-color: rgba(126, 157, 187, 0.45);
+
+    .project__arrow {
+      color: var(--bg);
+      background: var(--text);
+      border-color: transparent;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    @media (hover: hover) and (pointer: fine) {
+      .project:hover .project__media img {
+        transform: scale(1.045);
+      }
+    }
+
+    .project:is(:hover, :focus-visible) {
+      .project__arrow {
+        transform: translate(3px, -3px);
+      }
+
+      .project__arrow svg {
+        transform: translate(1px, -1px);
+      }
+    }
+  }
+</style>
