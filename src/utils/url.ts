@@ -6,3 +6,12 @@
 export function cleanPath(pathname: string): string {
   return pathname.replace(/(\/index)?\.html$/, '') || '/';
 }
+
+/**
+ * Link to a project's case study page. Every project card (homepage and
+ * /case-studies) uses this, so the target changes in one place.
+ * TODO: return `/case-studies/${slug}` once the case study pages exist.
+ */
+export function caseStudyUrl(_slug: string): string {
+  return '#';
+}

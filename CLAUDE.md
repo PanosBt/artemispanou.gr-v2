@@ -46,7 +46,9 @@ src/
 - If a parent needs to style a child component's root, the child takes `class` and spreads `...attrs` onto its root, which forwards Astro's scope attribute. Don't use `:global()` for this.
 - SVG assets in `src/assets` are imported as components (`import Icon from '…svg'`). Icons use `currentColor`.
 - JS only where needed: page scripts live in `src/js/` and are imported from the component's `<script>`. Prefer CSS (including scroll-driven animations in `@supports`) for motion.
+- Reveal on scroll: add `class="reveal"` to any element (stagger with `--reveal-delay`). `js/reveal.js` (loaded in `BaseLayout`) fades it in the first time it enters the viewport; without JS or with reduced motion it is simply visible.
 - Homepage sections are in `components/home/`. The featured case studies are the `featuredCaseStudies` slug list in `pages/index.astro`.
+- Every project is one file in `src/content/case-studies/` (schema in `content.config.ts`): `order`, `category`, `summary`, `thumbnail` + `thumbnailAlt`. Projects without their own artwork reuse the Booking System thumbnail with an empty alt. All project cards link through `caseStudyUrl()` in `utils/url.ts` (`#` until the case study pages exist).
 - Global styles: `global.scss`, imported once in `BaseLayout`. Component styles: `<style lang="scss">` (scoped), with `@use '../styles/tokens' as *;`.
 - Design tokens (colors, type, spacing, breakpoints) come from Figma variables and go in `_tokens.scss` / `_mixins.scss`.
 
@@ -58,7 +60,7 @@ Clean URLs with no trailing slash: `build.format: 'file'` + `trailingSlash: 'nev
 |---|---|
 | `/` | `src/pages/index.astro` |
 | `/case-studies` | `src/pages/case-studies.astro` (listing, reads the collection) |
-| `/case-studies/<slug>` (`celeste`, `booking-system`, `chris-raptis`) | `src/pages/case-studies/[slug].astro` (single template) |
+| `/case-studies/<slug>` (one per project file, e.g. `celeste`, `booking-system`) | `src/pages/case-studies/[slug].astro` (single template) |
 
 - All case studies share one layout: one template plus one data file per case study in `src/content/case-studies/`, with images in `src/assets/case-studies/<slug>/`. The data format (YAML vs Markdown/MDX) and the schema get decided when we build that page.
 - `Astro.url.pathname` ends in `.html` at build time because of `format: 'file'`. `BaseLayout` strips it for canonical/OG URLs, so reuse that logic wherever a clean URL is needed.

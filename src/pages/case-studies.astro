@@ -1,0 +1,137 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectCard from '../components/case-studies/ProjectCard.astro';
+
+// Every project in src/content/case-studies, in their `order`.
+const projects = (await getCollection('case-studies')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title="Case Studies — Artemis Panou"
+  description="A collection of real projects, from early ideas to final outcomes — the challenges, the process and the work behind them."
+>
+  <header class="intro container">
+    <h1 class="intro__title">
+      <span>Selected</span>
+      <span>Case <em>Studies</em></span>
+    </h1>
+    <p class="intro__lede">
+      A collection of real projects, from early ideas to final outcomes — the challenges, the
+      process and the work behind them.
+    </p>
+  </header>
+
+  <ul class="projects container" aria-label="Case studies">
+    {
+      projects.map((entry, i) => (
+        <li class="projects__item reveal">
+          <ProjectCard entry={entry} number={i + 1} eager={i < 2} />
+        </li>
+      ))
+    }
+  </ul>
+
+  <hr class="closing-rule container" />
+</BaseLayout>
+
+<style lang="scss">
+  @use '../styles/mixins' as *;
+
+  // ── header ──────────────────────────────────────────────────────────
+  .intro {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    padding-top: 92px;
+    padding-bottom: 30px;
+
+    @include mq(md) {
+      gap: 22px;
+      padding-top: 124px;
+      padding-bottom: 42px;
+    }
+
+    @include mq(xl) {
+      gap: 28px;
+      padding-top: 140px;
+      padding-bottom: 56px;
+    }
+  }
+
+  // Display/Archive Title: 55 → 88 → 124, Bold, -4.5% tracking
+  .intro__title {
+    font-family: var(--font-display);
+    font-size: 55px;
+    font-weight: 700;
+    line-height: 0.9;
+    letter-spacing: -0.045em;
+
+    @include mq(md) {
+      font-size: 88px;
+    }
+
+    @include mq(xl) {
+      font-size: 124px;
+    }
+
+    span {
+      display: block;
+    }
+
+    em {
+      color: var(--accent-blue-text);
+      font-style: normal;
+    }
+  }
+
+  .intro__lede {
+    @include text-body;
+    max-width: 480px;
+    color: var(--text-muted);
+
+    @include mq(xl) {
+      @include text-body(large);
+      max-width: 560px;
+    }
+  }
+
+  // ── grid: one column, two from tablet up ────────────────────────────
+  .projects {
+    display: grid;
+    gap: 16px;
+
+    @include mq(md) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 23px;
+    }
+
+    @include mq(xl) {
+      gap: 32px;
+    }
+  }
+
+  // The right-hand card of each row follows its neighbour in.
+  .projects__item:nth-child(even) {
+    @include mq(md) {
+      --reveal-delay: 90ms;
+    }
+  }
+
+  // ── hairline before the footer ──────────────────────────────────────
+  .closing-rule {
+    height: 1px;
+    margin-top: 64px;
+    background: linear-gradient(90deg, transparent, var(--line) 12%, var(--line) 88%, transparent)
+      content-box;
+    border: 0;
+
+    @include mq(md) {
+      margin-top: 90px;
+    }
+
+    @include mq(xl) {
+      margin-top: 120px;
+    }
+  }
+</style>
