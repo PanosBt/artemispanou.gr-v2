@@ -1,0 +1,176 @@
+---
+/** Nav/Capsule: fixed floating navigation. */
+import LogoMark from '../assets/logo-mark.svg';
+import PillLink from './PillLink.astro';
+import { cleanPath } from '../utils/url';
+
+const path = cleanPath(Astro.url.pathname);
+
+const links = [
+  { label: 'Home', href: '/', current: path === '/', class: 'nav__link--home' },
+  { label: 'Work', href: '/case-studies', current: path.startsWith('/case-studies') },
+];
+---
+
+<nav class="nav" aria-label="Primary">
+  <a class="nav__brand" href="/" aria-label="Artemis Panou — home">
+    <LogoMark class="nav__logo" aria-hidden="true" />
+  </a>
+  {
+    links.map((link) => (
+      <a
+        class:list={['nav__link', link.class]}
+        href={link.href}
+        aria-current={link.current ? 'page' : undefined}
+      >
+        <span class="nav__label">
+          <span data-label={link.label}>{link.label}</span>
+        </span>
+      </a>
+    ))
+  }
+  <PillLink class="nav__cta" href="#contact" label="Keep in Touch" />
+</nav>
+
+<style lang="scss">
+  @use '../styles/mixins' as *;
+
+  .nav {
+    position: fixed;
+    top: 12px;
+    left: 50%;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    max-width: calc(100vw - 24px);
+    padding: 3px;
+    background: linear-gradient(180deg, rgba(23, 33, 44, 0.82), rgba(17, 25, 35, 0.78));
+    border: 1px solid rgba(237, 241, 244, 0.09);
+    border-radius: 999px;
+    box-shadow:
+      inset 0 1px 0 rgba(237, 241, 244, 0.06),
+      0 18px 40px -20px rgba(0, 0, 0, 0.75);
+    transform: translateX(-50%);
+    backdrop-filter: blur(18px);
+
+    @include mq(md) {
+      top: 22px;
+      gap: 4px;
+    }
+  }
+
+  .nav__brand {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding-inline: 9px;
+    border-radius: 999px;
+    transition: transform 0.35s var(--ease-out);
+
+    @include mq(md) {
+      padding-inline: 12px;
+    }
+
+    &:hover {
+      transform: scale(1.07);
+    }
+
+    &:focus-visible {
+      outline-offset: -2px;
+    }
+  }
+
+  // The reset's max-width: 100% would collapse the mark inside the shrink-to-fit link.
+  .nav__logo {
+    max-width: none;
+  }
+
+  // The mark draws itself in on load (its path has pathLength="1").
+  .nav__logo :global(path) {
+    stroke-dasharray: 1;
+    animation: logo-draw 1.3s var(--ease-out) 0.2s both;
+  }
+
+  @keyframes logo-draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+  }
+
+  // Nav/Link: the label slides up to reveal a second copy on hover/focus.
+  .nav__link {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    height: 44px;
+    padding-inline: 10px;
+    color: var(--text-muted);
+    font-size: 11.5px;
+    font-weight: 500;
+    line-height: 1;
+    white-space: nowrap;
+    border-radius: 999px;
+
+    @include mq(md) {
+      padding-inline: 16px;
+      font-size: 13px;
+    }
+
+    &:focus-visible {
+      outline-offset: -2px;
+    }
+
+    &[aria-current='page'] {
+      color: var(--text);
+    }
+
+    // Clips the label to one line, so the second copy waits out of sight.
+    .nav__label {
+      display: block;
+      overflow: hidden;
+    }
+
+    [data-label] {
+      position: relative;
+      display: block;
+      transition: transform 0.4s var(--ease-out);
+
+      &::after {
+        content: attr(data-label);
+        position: absolute;
+        top: 100%;
+        left: 0;
+        color: var(--text);
+      }
+    }
+
+    &:hover [data-label],
+    &:focus-visible [data-label] {
+      transform: translateY(-100%);
+    }
+  }
+
+  // The logo already links home, so "Home" is hidden on narrow screens.
+  .nav__link--home {
+    display: none;
+
+    @include mq(md) {
+      display: inline-flex;
+    }
+  }
+
+  .nav__cta {
+    margin-left: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav__link:hover [data-label],
+    .nav__link:focus-visible [data-label] {
+      transform: none;
+    }
+
+    .nav__link:hover {
+      color: var(--text);
+    }
+  }
+</style>

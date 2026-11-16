@@ -1,0 +1,182 @@
+---
+import SectionHeading from '../SectionHeading.astro';
+import ServiceObject, { type ServiceObjectKind } from './ServiceObject.astro';
+
+const services: { name: string; tags: string; description: string; object: ServiceObjectKind }[] = [
+  {
+    name: 'UX Design',
+    tags: 'Research · Flows · Prototypes',
+    description:
+      'I turn complexity into clear user journeys, thoughtful structure and purposeful interactions.',
+    object: 'ux',
+  },
+  {
+    name: 'Product & UI Design',
+    tags: 'Figma · Responsive · Systems',
+    description:
+      'I design polished interfaces with strong hierarchy, visual character and consistency across screens.',
+    object: 'product',
+  },
+  {
+    name: 'Visual Identity',
+    tags: 'Brand · Art Direction · Motion',
+    description:
+      'I build visual languages that give brands a recognisable voice across every digital touchpoint.',
+    object: 'identity',
+  },
+  {
+    name: 'Design to Build',
+    tags: 'HTML · CSS · JS · Claude Code',
+    description:
+      'My frontend background helps me design realistically and collaborate closely through implementation.',
+    object: 'build',
+  },
+];
+---
+
+<section class="services container" aria-labelledby="services-title">
+  <div class="reveal">
+    <SectionHeading id="services-title" eyebrow="What I do" title="Services" />
+  </div>
+
+  <ol class="services__grid reveal">
+    {
+      services.map((service, i) => (
+        <li class="service">
+          <p class="service__number" aria-hidden="true">
+            {String(i + 1).padStart(3, '0')}
+          </p>
+          <div class="service__object">
+            <ServiceObject kind={service.object} />
+          </div>
+          <h3 class="service__name">{service.name}</h3>
+          <p class="service__tags">{service.tags}</p>
+          <p class="service__description">{service.description}</p>
+        </li>
+      ))
+    }
+  </ol>
+</section>
+
+<style lang="scss">
+  @use '../../styles/mixins' as *;
+
+  .services {
+    padding-top: 56px;
+    padding-bottom: 40px;
+
+    @include mq(md) {
+      padding-top: 72px;
+      padding-bottom: 51px;
+    }
+
+    @include mq(xl) {
+      padding-top: 96px;
+      padding-bottom: 72px;
+    }
+  }
+
+  // One column → 2 × 2 → four 296px columns, with hairline dividers.
+  .services__grid {
+    display: grid;
+    margin-top: 26px;
+
+    @include mq(sm) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    @include mq(md) {
+      margin-top: 35px;
+    }
+
+    @include mq(xl) {
+      grid-template-columns: repeat(4, minmax(0, 296px));
+      margin-top: 44px;
+    }
+  }
+
+  .service {
+    --svc-stroke: rgba(144, 155, 165, 0.55);
+    --svc-stroke-soft: rgba(86, 116, 145, 0.75);
+
+    display: flex;
+    flex-direction: column;
+    padding-block: 26px;
+    transition: background-color 0.45s var(--ease);
+
+    // Dividers differ per layout: one column / 2 × 2 / one row.
+    @include mq-below(sm) {
+      & + & {
+        border-top: 1px solid var(--line);
+      }
+    }
+
+    @include mq-between(sm, xl) {
+      &:nth-child(even) {
+        border-left: 1px solid var(--line);
+      }
+
+      &:nth-child(n + 3) {
+        border-top: 1px solid var(--line);
+      }
+    }
+
+    @include mq(xl) {
+      padding: 30px 22px 38px 28px;
+
+      & + & {
+        border-left: 1px solid var(--line);
+      }
+    }
+
+    // Active state: raised panel, slightly stronger strokes.
+    @media (hover: hover) {
+      &:hover {
+        --svc-stroke: rgba(144, 155, 165, 0.72);
+        --svc-stroke-soft: rgba(86, 116, 145, 0.95);
+
+        background-color: var(--surface-raised);
+      }
+    }
+  }
+
+  .service__number {
+    color: var(--text-faint);
+    font-size: 10.5px;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.22em;
+  }
+
+  .service__object {
+    width: 220px;
+    margin: 26px auto;
+
+    @include mq(xl) {
+      width: 232px;
+      margin: 50px auto 39px;
+    }
+  }
+
+  .service__name {
+    @include text-heading(3);
+    color: var(--text);
+
+    // Figma keeps each title on one line in the 296px desktop columns.
+    @include mq(xl) {
+      white-space: nowrap;
+    }
+  }
+
+  .service__tags {
+    @include text-label;
+    margin-top: 11px;
+    color: var(--text-faint);
+  }
+
+  .service__description {
+    @include text-body(small);
+    margin-top: 13px;
+    color: var(--text-muted);
+  }
+</style>
